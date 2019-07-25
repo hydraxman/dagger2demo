@@ -1,13 +1,15 @@
 package com.example.dagger2demo;
 
-import com.example.mylibrary.UserInfoModule;
-
-import javax.inject.Singleton;
+import com.example.dagger2demo.annotations.PerActivity;
 
 import dagger.Component;
 
-@Singleton
-@Component(modules = {AppModule.class, UserInfoModule.class})
+@PerActivity
+@Component(dependencies = {AppComponent.class}, modules = {UserInfoModule.class})
 public interface CoreComponent {
-    void inject(MainActivity mainActivity);
+    /**
+     *
+     * @param activity the specific instance that needs injection
+     */
+    void inject(MainActivity activity);
 }

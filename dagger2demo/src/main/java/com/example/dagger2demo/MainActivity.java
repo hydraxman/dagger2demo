@@ -3,14 +3,13 @@ package com.example.dagger2demo;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.mylibrary.DataCallback;
 import com.example.mylibrary.UserInfoController;
-import com.example.mylibrary.UserInfoModule;
 import com.example.mylibrary.entity.UserInfo;
 
 import javax.inject.Inject;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -22,14 +21,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        DaggerCoreComponent.builder().appModule(new AppModule(getApplication()))
+        App app = (App) getApplication();
+        DaggerCoreComponent.builder().appComponent(app.getAppComponent())
                 .userInfoModule(new UserInfoModule()).build().inject(this);
         helloText = findViewById(R.id.hello);
         userInfoController.fetchUserInfo(new DataCallback<UserInfo>() {
             @Override
             public void onDataFetched(UserInfo data) {
                 // Refresh UI
-                helloText.setText(data.getName() + ": " + data.getServiceId());
+                helloText.setText(String.format("%s - %s", data.getName(), data.getServiceId()));
             }
         });
     }

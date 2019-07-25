@@ -3,18 +3,22 @@ package com.example.mylibrary.impl;
 import com.example.mylibrary.DataCallback;
 import com.example.mylibrary.UserInfoController;
 import com.example.mylibrary.entity.UserInfo;
+import com.example.uilib.Toaster;
 
 
 public class UserInfoControllerImpl implements UserInfoController {
-    private DeviceInfoManager deviceInfoController;
+    private final Toaster toaster;
+    private final DeviceInfoManager deviceInfoController;
 
-    public UserInfoControllerImpl(DeviceInfoManager deviceInfoController) {
+    public UserInfoControllerImpl(DeviceInfoManager deviceInfoController, Toaster toaster) {
         this.deviceInfoController = deviceInfoController;
+        this.toaster = toaster;
     }
 
     public void fetchUserInfo(DataCallback<UserInfo> callback) {
         //....
         String serviceIdFromDevice = deviceInfoController.getServiceIdFromDevice();
+        toaster.longToast(String.format("id is %s", serviceIdFromDevice));
         UserInfo userInfo = getUserInfo(serviceIdFromDevice);
         callback.onDataFetched(userInfo);
     }
