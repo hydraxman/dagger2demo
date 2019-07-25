@@ -1,1 +1,1 @@
-include ':app', ':dagger2demo', ':mylibrary', ':ui-lib'
+include ':dagger2demo', ':mylibrary', ':ui-lib', ':sample-processor', ':sample-annotation', ':sample-api'
