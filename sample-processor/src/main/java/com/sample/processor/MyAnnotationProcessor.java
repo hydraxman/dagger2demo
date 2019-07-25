@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService;
 import com.sample.anno.BindView;
 import com.sample.processor.model.AnnotatedClass;
 import com.sample.processor.model.BindViewField;
+import com.squareup.javapoet.JavaFile;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -23,7 +24,7 @@ import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
 @AutoService(Processor.class)
-public class MyProcessor extends AbstractProcessor {
+public class MyAnnotationProcessor extends AbstractProcessor {
 
     private Filer mFiler;
     private Elements mElementUtils;
@@ -33,7 +34,6 @@ public class MyProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        error("Generate init---------------------------------------------------------");
         mElementUtils = processingEnv.getElementUtils();
         mMessager = processingEnv.getMessager();
         mFiler = processingEnv.getFiler();
@@ -64,7 +64,9 @@ public class MyProcessor extends AbstractProcessor {
         try {
             for (AnnotatedClass annotatedClass : mAnnotatedClassMap.values()) {
                 info("generating file for %s", annotatedClass.getFullClassName());
-                annotatedClass.generateFinder().writeTo(mFiler);
+                JavaFile javaFile = annotatedClass.generateFinder();
+                info("generating file for %s", javaFile.packageName);
+                javaFile.writeTo(mFiler);
             }
         } catch (Exception e) {
             e.printStackTrace();
