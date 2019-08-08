@@ -43,21 +43,25 @@ public class AnnotatedClass {
                 .addParameter(TypeName.get(mClassElement.asType()), "host", Modifier.FINAL)
                 .addParameter(TypeName.OBJECT, "source")
                 .addParameter(TypeUtil.FINDER, "finder");
+
         for (BindViewField field : mFiled) {
-            methodBuilder.addStatement("host.$N=($T)finder.findView(source,$L)", field.getFieldName()
-                    , ClassName.get(field.getFieldType()), field.getResId());
+            // placeholder: $L for Literals, $S for Strings, $T for Types, $N for Names
+            methodBuilder.addStatement("host.$N=($T)finder.findView(source,$L)",
+                    field.getFieldName(), ClassName.get(field.getFieldType()), field.getResId());
         }
 
         String packageName = getPackageName(mClassElement);
         String className = getClassName(mClassElement, packageName);
         ClassName bindClassName = ClassName.get(packageName, className);
-        TypeSpec finderClass = TypeSpec.classBuilder(bindClassName.simpleName() + "$$Injector")
+
+        TypeSpec injectorClass = TypeSpec.classBuilder(bindClassName.simpleName() + "$$Injector")
                 .addModifiers(Modifier.PUBLIC)
+                // ParameterizedType: public class MainActivity$$Injector implements Injector<MainActivity>
                 .addSuperinterface(ParameterizedTypeName.get(TypeUtil.INJECTOR, TypeName.get(mClassElement.asType())))
                 .addMethod(methodBuilder.build())
                 .build();
 
-        return JavaFile.builder(packageName, finderClass).build();
+        return JavaFile.builder(packageName, injectorClass).build();
     }
 
     public String getPackageName(TypeElement type) {

@@ -5,11 +5,14 @@ import com.example.mylibrary.UserInfoController;
 import com.example.mylibrary.entity.UserInfo;
 import com.example.uilib.Toaster;
 
+import javax.inject.Inject;
+
 
 public class UserInfoControllerImpl implements UserInfoController {
     private final Toaster toaster;
     private final DeviceInfoManager deviceInfoController;
 
+    @Inject
     public UserInfoControllerImpl(DeviceInfoManager deviceInfoController, Toaster toaster) {
         this.deviceInfoController = deviceInfoController;
         this.toaster = toaster;
@@ -21,6 +24,11 @@ public class UserInfoControllerImpl implements UserInfoController {
         toaster.longToast(String.format("id is %s", serviceIdFromDevice));
         UserInfo userInfo = getUserInfo(serviceIdFromDevice);
         callback.onDataFetched(userInfo);
+    }
+
+    @Override
+    public void destroy() {
+        deviceInfoController.destroy();
     }
 
     private UserInfo getUserInfo(String serviceIdFromDevice) {

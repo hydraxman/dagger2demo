@@ -1,6 +1,5 @@
 package com.sample.processor;
 
-import com.google.auto.service.AutoService;
 import com.sample.anno.BindView;
 import com.sample.processor.model.AnnotatedClass;
 import com.sample.processor.model.BindViewField;
@@ -15,7 +14,6 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
@@ -23,7 +21,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
-@AutoService(Processor.class)
+//@AutoService(Processor.class)
 public class MyAnnotationProcessor extends AbstractProcessor {
 
     private Filer mFiler;
@@ -37,6 +35,7 @@ public class MyAnnotationProcessor extends AbstractProcessor {
         mElementUtils = processingEnv.getElementUtils();
         mMessager = processingEnv.getMessager();
         mFiler = processingEnv.getFiler();
+        info("MyAnnotationProcessor init called %s", processingEnv.getOptions().toString());
     }
 
     @Override
@@ -65,7 +64,7 @@ public class MyAnnotationProcessor extends AbstractProcessor {
             for (AnnotatedClass annotatedClass : mAnnotatedClassMap.values()) {
                 info("generating file for %s", annotatedClass.getFullClassName());
                 JavaFile javaFile = annotatedClass.generateFinder();
-                info("generating file for %s", javaFile.packageName);
+                info("generating accomplished for %s", annotatedClass.getFullClassName());
                 javaFile.writeTo(mFiler);
             }
         } catch (Exception e) {
@@ -76,14 +75,16 @@ public class MyAnnotationProcessor extends AbstractProcessor {
     }
 
     /**
+     * assemble the AnnotatedClass obj and put it into mAnnotatedClassMap
      * @param roundEnv
      */
     private void processBindView(RoundEnvironment roundEnv) {
-        for (Element element : roundEnv.getElementsAnnotatedWith(BindView.class)) {
+        Set<? extends Element> annotated = roundEnv.getElementsAnnotatedWith(BindView.class);
+        for (Element element : annotated) {
+            info("annotated_element=" + element.getSimpleName() + ",annotated_modifiers=" + element.getModifiers());
             AnnotatedClass annotatedClass = getAnnotatedClass(element);
             BindViewField field = new BindViewField(element);
             annotatedClass.addField(field);
-            System.out.print("p_element=" + element.getSimpleName() + ",p_set=" + element.getModifiers());
         }
     }
 
